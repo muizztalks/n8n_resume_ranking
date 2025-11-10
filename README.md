@@ -14,7 +14,7 @@ The workflow streamlines the recruitment process by:
 5. Sending a **daily AI-generated email** to HR with the **top 3 candidates**, including their key metrics and summaries.
 
 ---
-workflow final.JPG
+![Workflow Overview](workflow%20final.JPG)
 ---
 
 ## ⚙️ Key Features

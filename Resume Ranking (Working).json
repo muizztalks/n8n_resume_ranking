@@ -1,0 +1,872 @@
+{
+  "name": "Resume Ranking (Working)",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1sw7VJjKKoi8hb152hpYqcgzYApmyLvBi",
+            "mode": "list",
+            "cachedResultName": "OLD CVs",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1sw7VJjKKoi8hb152hpYqcgzYApmyLvBi"
+          }
+        },
+        "options": {}
+      },
+      "name": "List PDFs in Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        -240
+      ],
+      "id": "1fe158fb-7dbf-436d-a70d-2add3c1bc9f8",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hpAP4PZXWYojHjRM",
+          "name": "Google Drive Resume"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "name": "Download Each PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1072,
+        -304
+      ],
+      "id": "3355db7e-39c1-4b34-a345-51f25eca2664",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hpAP4PZXWYojHjRM",
+          "name": "Google Drive Resume"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -304
+      ],
+      "id": "a1e7cde2-d9ab-4a44-aac1-3908174e7a99",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from previous nodes\nconst descData = $('Clean Description').first().json;\n\n// Generate a unique ID\n// Combines timestamp + random 4-digit number for guaranteed uniqueness\nconst uniqueId = `ID-${Date.now()}-${Math.floor(Math.random() * 10000)}`;\n\n// Build the output object\nreturn {\n  json: {\n    id: uniqueId,\n    description: descData.cleaned_text || ''\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        -304
+      ],
+      "id": "1004f7d8-46a8-42b6-9c53-cf00aa76db94",
+      "name": "Generate Row Number"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk",
+          "mode": "list",
+          "cachedResultName": "n8n resume",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Job Description": "={{ $json.description }}",
+            "#": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "#"
+          ],
+          "schema": [
+            {
+              "id": "#",
+              "displayName": "#",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Description",
+              "displayName": "Job Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Matched Keywords",
+              "displayName": "Matched Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Missing Keywords",
+              "displayName": "Missing Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Match Count",
+              "displayName": "Match Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Keywords",
+              "displayName": "Total Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Match %",
+              "displayName": "Match %",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Relevance",
+              "displayName": "Relevance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        2000,
+        -256
+      ],
+      "id": "2e272d69-e418-429c-95cd-11e9bac184b5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8ZZ3NDxTbte7De6n",
+          "name": "Google Sheets muizztalks"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -240
+      ],
+      "id": "cab4f033-5191-45df-ad0b-b4a034d9f0b6",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# GREEDY ALGORITHM FOR RESUME RANKING\n# Produces fields that match the Google Sheets mapping, including \"Total Keywords\" and \"#\"\n\nimport re\nfrom datetime import datetime\n\n# Read all input items correctly from n8n\nitems = _input.all()\n\n# If no input, return debug info so n8n shows something\nif not items:\n    return [{\n        \"json\": {\n            \"info\": \"No input items received by Rank Resumes. Check the previous node output.\",\n            \"received_items\": 0\n        }\n    }]\n\n# Define job keywords\njob_keywords = [\n    'python', 'machine learning', 'ml', 'ai', 'artificial intelligence',\n    'nlp', 'deep learning', 'tensorflow', 'pytorch', 'scikit-learn',\n    'data analysis', 'eda', 'pandas', 'numpy', 'sql', 'mysql',\n    'automation', 'n8n', 'make', 'api', 'git', 'github',\n    'computer vision', 'neural networks', 'classification', 'regression',\n    'c++', 'algorithms', 'data structures', 'opencv', 'django', 'flask'\n]\n\nTOTAL_KEYWORDS = len(job_keywords)\n\n# Weights\nKEYWORD_MATCH_WEIGHT = 10\nMATCH_PERCENTAGE_WEIGHT = 5\nEXPERIENCE_WEIGHT = 3\nEDUCATION_WEIGHT = 2\n\ndef calculate_keyword_score(text, keywords):\n    if not text:\n        return 0, [], [], 0\n    low = text.lower()\n    matched, missing = [], []\n    for kw in keywords:\n        if kw.lower() in low:\n            matched.append(kw)\n        else:\n            missing.append(kw)\n    count = len(matched)\n    pct = (count / len(keywords) * 100) if keywords else 0\n    return count, matched, missing, pct\n\ndef extract_experience_years(text):\n    if not text:\n        return 0\n    matches = re.findall(r'(\\d{4})\\s*[-—]\\s*(\\d{4}|present|current)', text.lower())\n    cur = datetime.now().year\n    years = 0\n    for s, e in matches:\n        try:\n            start = int(s)\n            end = cur if e in ['present', 'current'] else int(e)\n            years = max(years, end - start)\n        except:\n            continue\n    return years\n\ndef check_education(text):\n    if not text:\n        return 0\n    t = text.lower()\n    if 'phd' in t or 'doctorate' in t:\n        return 10\n    if 'master' in t or 'm.s.' in t or 'ms ' in t:\n        return 8\n    if 'bachelor' in t or 'b.s.' in t or 'bs ' in t:\n        return 6\n    if 'associate' in t or 'diploma' in t:\n        return 4\n    if 'a level' in t or 'a-level' in t:\n        return 3\n    return 1\n\ndef relevance(pct):\n    if pct >= 70:\n        return \"Highly Relevant\"\n    if pct >= 50:\n        return \"Relevant\"\n    if pct >= 30:\n        return \"Somewhat Relevant\"\n    return \"Not Relevant\"\n\nranked = []\n\nfor idx, item in enumerate(items, start=1):\n    data = item.get('json', {})\n    # prefer existing sheet id '#' if present, otherwise create one\n    sheet_hash = data.get('#') or data.get('ID') or f\"resume-{idx}\"\n    # try to find name if present, otherwise blank\n    name = (data.get('Name') or '').strip()\n    text = (data.get('Job Description') or data.get('description') or '').strip()\n\n    # Skip if no text or too short\n    if not text or len(text) < 50:\n        continue\n\n    match_count, matched, missing, pct = calculate_keyword_score(text, job_keywords)\n    years = extract_experience_years(text)\n    edu = check_education(text)\n\n    score = (match_count * KEYWORD_MATCH_WEIGHT) + (pct * MATCH_PERCENTAGE_WEIGHT) + (years * EXPERIENCE_WEIGHT) + (edu * EDUCATION_WEIGHT)\n\n    ranked.append({\n        \"#\": sheet_hash,                        # keep the '#' column for matching\n        \"ID\": sheet_hash,                       # also emit ID for flexibility\n        \"Name\": name,\n        \"Job Description\": text,\n        \"Role\": \"AI/ML Developer\",              # optional fixed role\n        \"Matched Keywords\": \", \".join(matched),\n        \"Missing Keywords\": \", \".join(missing),\n        \"Match Count\": match_count,\n        \"Total Keywords\": TOTAL_KEYWORDS,       # <-- added, was missing before\n        \"Match %\": round(pct, 2),\n        \"Experience Years\": years,\n        \"Education Score\": edu,\n        \"Total Score\": round(score, 2),\n        \"Relevance\": relevance(pct)\n    })\n\n# Sort by total score and add Rank\nranked.sort(key=lambda x: x[\"Total Score\"], reverse=True)\nfor i, r in enumerate(ranked, start=1):\n    r[\"Rank\"] = i\n\n# Return list of JSON objects\nreturn [{\"json\": r} for r in ranked]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        128
+      ],
+      "id": "f1353c52-80cd-4cae-ba81-d85830eb10f4",
+      "name": "Rank Resumes"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk",
+          "mode": "list",
+          "cachedResultName": "n8n resume",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "#": "={{ $json[\"ID\"] }}",
+            "Matched Keywords": "={{ $json['Matched Keywords'] }}",
+            "Missing Keywords": "={{ $json['Missing Keywords'] }}",
+            "Match Count": "={{ $json['Match Count'] }}",
+            "Total Keywords": "={{ $json['Total Keywords'] }}",
+            "Match %": "={{ $json['Match %'] }}",
+            "Relevance": "={{ $json.Relevance }}",
+            "Rank": "={{ $json.Rank }}"
+          },
+          "matchingColumns": [
+            "#"
+          ],
+          "schema": [
+            {
+              "id": "#",
+              "displayName": "#",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Description",
+              "displayName": "Job Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Matched Keywords",
+              "displayName": "Matched Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Missing Keywords",
+              "displayName": "Missing Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Match Count",
+              "displayName": "Match Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Keywords",
+              "displayName": "Total Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Match %",
+              "displayName": "Match %",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Relevance",
+              "displayName": "Relevance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        128
+      ],
+      "id": "8c3abd73-7c65-45bc-b37d-5d7d42074fd8",
+      "name": "Update Rankings in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8ZZ3NDxTbte7De6n",
+          "name": "Google Sheets muizztalks"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        848,
+        -240
+      ],
+      "id": "023034f4-e05b-4c02-99fc-0d7e7718f648",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw text (from the previous node)\nlet text = $('Extract from File').first().json.text || '';\n\n// Clean up unwanted characters, line breaks, and symbols\ntext = text\n  .replace(/\\r?\\n+/g, ' ')        // Replace all newlines with a space\n  .replace(/\\t+/g, ' ')           // Replace tabs with spaces\n  .replace(/\\s{2,}/g, ' ')        // Collapse multiple spaces into one\n  .replace(/[*_`#\\[\\]()|\\\\]/g, '')// Remove markdown and pipe symbols\n  .replace(/[“”‘’\"']/g, '')       // Remove smart quotes and normal quotes\n  .replace(/[^\\x20-\\x7E]/g, '')   // Remove non-ASCII/unreadable chars\n  .trim();                        // Trim leading/trailing spaces\n\nreturn {\n  json: {\n    cleaned_text: text\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -304
+      ],
+      "id": "5ef7d0da-3481-4691-a053-9419a645ddb0",
+      "name": "Clean Description"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk",
+          "mode": "list",
+          "cachedResultName": "n8n resume",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        128
+      ],
+      "id": "cd5ccaaa-ebbf-497a-a43f-4172383fb80c",
+      "name": "Get row(s) in n8n resume",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8ZZ3NDxTbte7De6n",
+          "name": "Google Sheets muizztalks"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        128
+      ],
+      "id": "c4fae023-103f-4510-9f8d-99de3ba4f156",
+      "name": "Schedule Trigger shampy"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        528
+      ],
+      "id": "c01d710f-ba43-4a79-b363-e885cee3a1e0",
+      "name": "Schedule Trigger wah shampy wah"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk",
+          "mode": "list",
+          "cachedResultName": "n8n resume",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        528
+      ],
+      "id": "78521e65-c02f-4328-8b0f-44c9b729a5bf",
+      "name": "Get again row(s) in n8n resume",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8ZZ3NDxTbte7De6n",
+          "name": "Google Sheets muizztalks"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node: Pick Top 3 and prepare concise prompt\n// Input: items from \"Get again row(s) in n8n resume\"\n// Output: a single item with a clean prompt for the LLM\n\nconst all = $input.all().map(i => i.json || {});\n\n// Normalize numeric rank; prefer \"Rank\" then \"Total Score\"\nconst rows = all\n  .map(r => {\n    const rankRaw = r.Rank ?? r['Rank'] ?? r.rank ?? r['#'] ?? r.ID ?? null;\n    const scoreRaw = r['Total Score'] ?? r['TotalScore'] ?? r.total_score ?? r['Total Score'];\n    const parsedRank = rankRaw ? parseInt(rankRaw, 10) : null;\n    const parsedScore = scoreRaw ? parseFloat(scoreRaw) : null;\n    return {\n      raw: r,\n      rank: Number.isFinite(parsedRank) ? parsedRank : null,\n      score: Number.isFinite(parsedScore) ? parsedScore : null\n    };\n  });\n\n// Prefer sorting by rank if any rows have numeric rank, otherwise by score descending\nlet topSorted;\nif (rows.some(r => r.rank !== null)) {\n  topSorted = rows.filter(r => r.rank !== null).sort((a,b) => a.rank - b.rank);\n} else {\n  topSorted = rows.filter(r => r.score !== null).sort((a,b) => b.score - a.score);\n}\n\n// Pick top 3\nconst top3 = topSorted.slice(0, 3);\n\n// Prepare candidate summaries\nconst summaries = top3.map((r, idx) => {\n  const src = r.raw;\n  const name = (src.Name || src.name || '').toString().trim() || 'Candidate ' + (idx + 1);\n  const rank = r.rank ?? (idx + 1);\n  const score = r.score ? r.score.toFixed(2) : 'N/A';\n  const matched = (src['Matched Keywords'] || src['Matched Keywords'] || src.matched || '').toString();\n  const matchPct = (src['Match %'] || src['Match %'] || '').toString();\n  const jd = (src['Job Description'] || src['Job Description'] || src.description || src.JD || '').toString();\n  \n  // Snippet: first 40 words\n  const snippet = jd.split(/\\s+/).slice(0, 40).join(' ').trim() + '...';\n  \n  return {\n    name,\n    rank,\n    score,\n    matched,\n    matchPct,\n    snippet\n  };\n});\n\n// Build a single, direct prompt\nconst prompt = `Create a professional HTML email for HR listing the top 3 candidates for an AI/ML Developer position.\n\nCANDIDATES:\n${summaries.map((s, i) => `\n${i + 1}. ${s.name}\n   - Rank: ${s.rank} | Score: ${s.score} | Match: ${s.matchPct}%\n   - Key Skills: ${s.matched || 'Not specified'}\n   - Summary: ${s.snippet}\n`).join('\\n')}\n\nREQUIREMENTS:\n- Output ONLY valid HTML (no markdown, no backticks, no commentary)\n- Use inline CSS styles for email compatibility\n- Include a subject line as <h2>\n- Create 3 candidate blocks with: name (bold), rank/score, skills, and brief summary\n- End with: \"View full resumes at: https://docs.google.com/spreadsheets/d/1iN3WxqEpNZEHtUdRYGykNpQf4RfcLzOmlTLFtkPf5Lk/edit\"\n- Keep it concise (under 300 words total)\n- Use professional, recruiter-friendly language\n\nOutput the HTML now:`;\n\nreturn {\n  json: {\n    llm_prompt: prompt,\n    candidate_count: summaries.length,\n    // Debug preview for testing\n    debug_summary: summaries.map(s => `${s.name} (Rank ${s.rank}, Score ${s.score})`).join('; ')\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        528
+      ],
+      "id": "cdf605c9-1c68-4ac1-88ff-ccbb954563e8",
+      "name": "Top 3 candidates"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.llm_prompt }}",
+        "options": {
+          "systemMessage": "You are an HTML email generator. Output ONLY the HTML body content - no explanations, no markdown code blocks, no thinking process, no preamble. Start directly with HTML tags. The output will be sent directly to Gmail, so use inline styles and keep it simple."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        528
+      ],
+      "id": "84c4be4b-6dd4-42f9-b96d-38c978c7b49c",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        976,
+        720
+      ],
+      "id": "e193665c-93cc-4a65-9b1f-3f9a53bb7b75",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "HrA1Jk85VpToQjVG",
+          "name": "groq n8n resume"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "muizzk4321@gmail.com",
+        "subject": "={{ \"Top 3 Candidates • \" + new Date().toLocaleDateString() }}",
+        "message": "={{ $json.cleaned_html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1648,
+        512
+      ],
+      "id": "91ea6704-203f-4a50-813b-c0543dfc2cbd",
+      "name": "Send a message to HR",
+      "webhookId": "c2f3a5a4-9183-426c-8349-a9782b8a1b02",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qMlJazlTmqVACf9a",
+          "name": "Gmail muizztalks"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Clean up LLM output to ensure pure HTML\nlet output = $json.output || '';\n\n// Remove markdown code blocks if present\noutput = output.replace(/```html\\n?/gi, '').replace(/```\\n?/g, '');\n\n// Remove any <think> tags or reasoning sections (some models add these)\noutput = output.replace(/<think>[\\s\\S]*?<\\/think>/gi, '');\n\n// Remove leading/trailing whitespace\noutput = output.trim();\n\n// If output doesn't start with HTML tag, try to find where HTML starts\nif (!output.startsWith('<')) {\n  const htmlMatch = output.match(/(<[^>]+>[\\s\\S]*)/);\n  if (htmlMatch) {\n    output = htmlMatch[1];\n  }\n}\n\n// Fallback: if still no valid HTML, create a simple message\nif (!output.includes('<') || !output.includes('>')) {\n  output = `<div style=\"font-family: Arial, sans-serif; padding: 20px;\">\n    <p>Error: Unable to generate HTML email. Please check the workflow.</p>\n    <p>Raw output: ${output.substring(0, 200)}</p>\n  </div>`;\n}\n\nreturn {\n  json: {\n    cleaned_html: output,\n    char_count: output.length\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        512
+      ],
+      "id": "d7710413-c846-4800-ba5f-a2903ee6704a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## Resume Upload Pipeline\n\n### Trigger: \nManual execution\n\n### Process: \nLists all PDF resumes in Google Drive folder. Downloads each PDF one by one. Extracts text content from PDFs. Cleans formatting (removes special chars, newlines). Generates unique ID for each resume. Appends resume data to Google Sheet\n\n### When to use: \nWhen you've uploaded new resumes to the Google Drive folder and want to process them immediately.\n",
+        "height": 336,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "45beb580-569d-49ec-a861-27011a9c0d18",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Auto-Ranking Pipeline\n\n### Trigger:\nEvery 1 minute (automated)\n\n### Process:\nReads all resumes from Google Sheet. Runs Python ranking algorithm that matches keywords (Python, ML, AI, etc.), calculates match percentage, extracts experience years, scores education level, and computes total score. Sorts by total score (highest first). Assigns ranks (1, 2, 3, etc.). Updates rankings in Google Sheet.\n\n### Purpose:\nKeeps resume rankings up-to-date automatically as new resumes are added.",
+        "height": 352,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "d5e8840b-88f1-4c3d-b8ea-cc5d675468c6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Top Candidates Email Pipeline\n\n### Trigger:\nDaily at 8:00 AM (automated)\n\n### Process:\nFetches all ranked resumes from sheet. Picks top 3 candidates by rank. Prepares candidate summaries with name, rank, score, matched skills/keywords, and brief resume snippet. Sends data to AI (Groq LLM) to generate professional HTML email. Cleans LLM output (removes markdown, thinking tags). Sends formatted email to HR with top 3 candidates summary and link to full spreadsheet.\n\n### Purpose:\nAutomatically notifies HR about the best candidates every morning.",
+        "height": 384,
+        "width": 672
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "eaef17eb-c41b-4a70-8a99-c204a781f7fa",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "List PDFs in Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List PDFs in Folder": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Each PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Clean Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Row Number": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank Resumes": {
+      "main": [
+        [
+          {
+            "node": "Update Rankings in Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download Each PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Description": {
+      "main": [
+        [
+          {
+            "node": "Generate Row Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Rankings in Sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Get row(s) in n8n resume": {
+      "main": [
+        [
+          {
+            "node": "Rank Resumes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger shampy": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in n8n resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger wah shampy wah": {
+      "main": [
+        [
+          {
+            "node": "Get again row(s) in n8n resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get again row(s) in n8n resume": {
+      "main": [
+        [
+          {
+            "node": "Top 3 candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 3 candidates": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a message to HR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d1d2055f-8985-419b-b647-c42dc01e602d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4787e16baf9d41dae264233e4b91254cc39d23061268e8df03160fcf94a05f72"
+  },
+  "id": "XTIWaUeCrhJDhIx4",
+  "tags": []
+}

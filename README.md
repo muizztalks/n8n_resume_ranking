@@ -106,8 +106,7 @@ The workflow streamlines the recruitment process by:
 
 **Example Output:**
 
-* Subject: `Top 3 Candidates • 10/11/2025`
-* Body: HTML-formatted email with each candidate’s score, key skills, and a link to the full Google Sheet.
+![Gmail Response](gmail%20response.JPG)
 
 ---
 
